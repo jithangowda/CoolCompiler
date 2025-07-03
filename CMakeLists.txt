@@ -10,4 +10,10 @@ include_directories(include)
 # glob source files
 file(GLOB_RECURSE SRC_FILES src/*cpp)
 
-add_executable(coolc ${SRC_FILES})
+add_executable(coolc ${SRC_FILES}
+        include/Token.h
+        src/Token.cpp)
+
+
+# example folder for cool files
+file(GLOB EXAMPLES examples/*.cl)
