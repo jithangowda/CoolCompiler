@@ -101,4 +101,10 @@ namespace cool {
         {"not", TokenType::NOT},
         {"true", TokenType::TRUE}
     };
+
+    // Special identifiers (not keywords but treated specially)
+    static const std::unordered_map<std::string, TokenType> SPECIAL_IDS = {
+        {"self", TokenType::SELF},
+        {"SELF_TYPE", TokenType::SELF_TYPE}
+    };
 }

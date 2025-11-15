@@ -20,7 +20,8 @@ namespace cool {
         char peek() const;
         char advance();
         void skipWhitespace();
-        void skipComment();
+        void skipLineComment();
+        void skipBlockComment();
         Token readNumber();
         Token readString();
         Token readIdentifier();
