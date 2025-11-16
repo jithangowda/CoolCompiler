@@ -15,6 +15,7 @@ namespace cool {
     public:
         explicit Lexer(const std::string& filePath);
         std::vector<Token> tokenize();
+        void printTokens() const;
 
     private:
         char peek() const;
@@ -27,6 +28,7 @@ namespace cool {
         Token readIdentifier();
         Token readOperator();
 
+        std::vector<Token> tokens;
         std::string source;
         size_t pos {0};
         int line {1};

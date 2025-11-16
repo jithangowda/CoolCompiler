@@ -13,6 +13,8 @@ int main(const int argc, char** argv) {
 
     try {
         cool::Lexer lex(filePath);
+        auto tokens = lex.tokenize();
+        lex.printTokens();
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << '\n';

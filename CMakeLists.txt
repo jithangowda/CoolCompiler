@@ -23,6 +23,7 @@ include_directories(include)
 add_executable(coolc
         src/main.cpp
         src/Lexer.cpp
-        )
+        src/Token.cpp
+)
 
 target_link_libraries(coolc ${llvm_libs})

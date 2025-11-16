@@ -107,4 +107,8 @@ namespace cool {
         {"self", TokenType::SELF},
         {"SELF_TYPE", TokenType::SELF_TYPE}
     };
+
+
+    // convert type name to string
+    std::string tokensToString(TokenType type);
 }

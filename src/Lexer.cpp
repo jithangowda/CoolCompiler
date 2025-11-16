@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 
 namespace cool {
@@ -23,8 +24,7 @@ namespace cool {
     }
 
     std::vector<cool::Token> cool::Lexer::tokenize() {
-        std::vector<cool::Token> tokens;
-
+        tokens.clear();
         while (pos < source.length()) {
 
             skipWhitespace();
@@ -35,13 +35,13 @@ namespace cool {
             char current = source[pos];
 
             if (isdigit(current))
-                tokens.push_back(readNumber());
+                tokens.emplace_back(readNumber());
 
             else if (current == '"')
-                tokens.push_back(readString());
+                tokens.emplace_back(readString());
 
             else if (isalpha(current) || current == '_')
-                tokens.push_back(readIdentifier());
+                tokens.emplace_back(readIdentifier());
 
             else if (ispunct(current)) {
                 if (current == '-' && pos+1 < source.length() && peek() == '-' ) {
@@ -53,11 +53,12 @@ namespace cool {
                     skipBlockComment();
                     continue;
                 }
-                tokens.push_back(readIdentifier());
+                tokens.emplace_back(readOperator());
             }
 
             else {
                 tokens.emplace_back(TokenType::UNKNOWN, std::string(1, current), line, column);
+                advance();
             }
         }
 
@@ -131,7 +132,7 @@ namespace cool {
         }
 
         if (depth > 0)
-            throw std::runtime_error("Unterminate Block comment");
+            throw std::runtime_error("Unterminated Block comment");
     }
 
     // eg - 68
@@ -212,7 +213,7 @@ namespace cool {
         if (s_it != SPECIAL_IDS.end())
             return Token{s_it->second, identifier, startLine, startCol};
 
-        TokenType type = (identifier == "self") ? TokenType::SELF : TokenType::SELF_TYPE;
+        TokenType type = isupper(identifier[0]) ? TokenType::TYPE_ID : TokenType::OBJECT_ID;
         return Token{type, identifier, startLine, startCol};
 
     }
@@ -258,6 +259,15 @@ namespace cool {
             case ',': return Token{TokenType::COMMA, op, startLine, startCol};
             case '.': return Token{TokenType::DOT, op, startLine, startCol};
             default: return Token{TokenType::UNKNOWN, op, startLine, startCol};
+        }
+    }
+
+    void cool::Lexer::printTokens() const {
+        for (auto & token : tokens) {
+            TokenType t = token.type;
+            std::string s = token.value;
+
+            std::cout << std::left << std::setw(15) << cool::tokensToString(t) << s << '\n';
         }
     }
 };
