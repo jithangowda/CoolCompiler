@@ -23,6 +23,7 @@ namespace cool {
         source = buffer.str();
     }
 
+    //----------------------------------------------------------------------------------------
     std::vector<cool::Token> cool::Lexer::tokenize() {
         tokens.clear();
         while (pos < source.length()) {
@@ -66,11 +67,13 @@ namespace cool {
         return tokens;
     }
 
+    //----------------------------------------------------------------------------------------
     void cool::Lexer::skipWhitespace() {
         while (pos < source.length() && std::isspace(source[pos]))
             advance();
     }
 
+    //----------------------------------------------------------------------------------------
     char cool::Lexer::peek() const {
         if (pos + 1 < source.length())
             return source[pos + 1];
@@ -78,6 +81,7 @@ namespace cool {
         return '\0';
     }
 
+    //----------------------------------------------------------------------------------------
     char cool::Lexer::advance() {
         if (pos >= source.length())
             return '\0';
@@ -94,12 +98,14 @@ namespace cool {
         return current;
     }
 
+    //----------------------------------------------------------------------------------------
     // anything between '--' and \n are skipped (page 15 cool-manual)
     void cool::Lexer::skipLineComment() {
         while (pos < source.length() && source[pos] != '\n')
             advance();
     }
 
+    //----------------------------------------------------------------------------------------
     // anything inside  (∗ . . . ∗) are skipped (page 15 cool-manual)
     // it does nested comments .. I dont know why but ok ;(
     /*
@@ -135,6 +141,7 @@ namespace cool {
             throw std::runtime_error("Unterminated Block comment");
     }
 
+    //----------------------------------------------------------------------------------------
     // eg - 68
     cool::Token cool::Lexer::readNumber() {
         int startLine {line};
@@ -148,6 +155,7 @@ namespace cool {
         return cool::Token{TokenType::INTEGER, number, startLine, startCol};
     }
 
+    //----------------------------------------------------------------------------------------
     // eg - "HelloWorld"
     cool::Token cool::Lexer::readString() {
         int startLine {line};
@@ -193,7 +201,7 @@ namespace cool {
 
     }
 
-
+    //----------------------------------------------------------------------------------------
     cool::Token cool::Lexer::readIdentifier() {
         int startLine {line};
         int startCol {column};
@@ -218,6 +226,7 @@ namespace cool {
 
     }
 
+    //----------------------------------------------------------------------------------------
     cool::Token cool::Lexer::readOperator() {
         int startLine {line};
         int startCol {column};
@@ -262,12 +271,13 @@ namespace cool {
         }
     }
 
+    //----------------------------------------------------------------------------------------
     void cool::Lexer::printTokens() const {
         for (auto & token : tokens) {
             TokenType t = token.type;
             std::string s = token.value;
 
-            std::cout << std::left << std::setw(15) << cool::tokensToString(t) << s << '\n';
+            std::cerr << std::left << std::setw(15) << cool::tokensToString(t) << s << '\n';
         }
     }
 };

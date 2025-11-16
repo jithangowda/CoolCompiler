@@ -69,6 +69,8 @@ namespace cool {
         ERROR
     };
 
+
+    //----------------------------------------------------------------------------------------
     // Token Structure
     struct Token {
         TokenType type;
@@ -80,6 +82,7 @@ namespace cool {
             : type(t), value(v), line(l), column(c) {}
     };
 
+    //----------------------------------------------------------------------------------------
     static const std::unordered_map<std::string, TokenType> KEYWORDS = {
         {"class", TokenType::CLASS},
         {"else", TokenType::ELSE},
@@ -102,13 +105,14 @@ namespace cool {
         {"true", TokenType::TRUE}
     };
 
+    //----------------------------------------------------------------------------------------
     // Special identifiers (not keywords but treated specially)
     static const std::unordered_map<std::string, TokenType> SPECIAL_IDS = {
         {"self", TokenType::SELF},
         {"SELF_TYPE", TokenType::SELF_TYPE}
     };
 
-
+    //----------------------------------------------------------------------------------------
     // convert type name to string
     std::string tokensToString(TokenType type);
 }
