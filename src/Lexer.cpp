@@ -248,6 +248,10 @@ namespace cool {
                 advance();
                 return Token{TokenType::LESS_EQUAL, twoCharOp, startLine, startCol};
             }
+            else if (twoCharOp == "=>") {
+                advance();
+                return Token{TokenType::DARROW, twoCharOp, startLine, startCol};
+            }
         }
 
         switch (first_operator) {

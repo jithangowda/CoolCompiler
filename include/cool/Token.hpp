@@ -52,6 +52,7 @@ namespace cool {
         LESS_EQUAL, // <=
         TILDE, // ~ (for some integer complement )
         AT, // @ (static dispatch)
+        DARROW, // =>
 
         // Brackets & special symbols
         LPAREN, // (

@@ -24,7 +24,6 @@ add_executable(coolc
         src/main.cpp
         src/Lexer.cpp
         src/Token.cpp
-        include/cool/Parser.h++
         src/Parser.cpp
 )
 

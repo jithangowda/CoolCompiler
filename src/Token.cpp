@@ -43,6 +43,7 @@ namespace cool {
         case TokenType::LESS_EQUAL: return "LESS_EQUAL";
         case TokenType::TILDE: return "TILDE";
         case TokenType::AT: return "AT";
+                case TokenType::DARROW: return "DARROW";
         case TokenType::LPAREN: return "LPAREN";
         case TokenType::RPAREN: return "RPAREN";
         case TokenType::LBRACE: return "LBRACE";
