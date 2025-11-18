@@ -5,8 +5,9 @@
 
 #include "cool/Parser.hpp"
 
-
 namespace cool {
+
+
 
     // Parser public methods
 
@@ -296,7 +297,7 @@ namespace cool {
         if (match(TokenType::ASSIGN)) {
 
             // if left is identifier
-            // will only work if left is a identifier
+            // will only work if left is an identifier
             if (auto id_node = dynamic_cast<IdentifierNode*>(left.get())) {
                 auto assign = std::make_unique<AssignmentNode>();
                 assign->identifier = id_node->name;
@@ -676,9 +677,6 @@ namespace cool {
 
         return left;
     }
-
-
-
 
 
 

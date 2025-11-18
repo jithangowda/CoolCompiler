@@ -1,5 +1,6 @@
 #include <iostream>
 #include "cool/Lexer.hpp"
+#include "cool/Parser.hpp"
 
 int main(const int argc, char** argv) {
 
@@ -15,6 +16,19 @@ int main(const int argc, char** argv) {
         cool::Lexer lex(filePath);
         auto tokens = lex.tokenize();
         lex.printTokens();
+
+        cool::Parser parser(tokens);
+        auto ast = parser.parse();
+
+        std::cout << "\n=== AST ===\n";
+        std::cout << "AST pointer: " << ast.get() << '\n';
+        if (ast) {
+            std::cout << "Number of classes: " << ast->classes.size() << '\n';
+            ast->print(0);
+        } else {
+            std::cout << "AST is NULL!\n";
+        }
+
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << '\n';

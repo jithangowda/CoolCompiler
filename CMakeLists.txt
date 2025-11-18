@@ -25,6 +25,8 @@ add_executable(coolc
         src/Lexer.cpp
         src/Token.cpp
         src/Parser.cpp
+        src/AST.cpp
+
 )
 
 target_link_libraries(coolc ${llvm_libs})
