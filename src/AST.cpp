@@ -7,10 +7,10 @@
 
 namespace cool {
 
-
+static int ASTline {0};
     // print func helper func to print indent
     static void printIndent(int indent) {
-        std::cout << "[" << indent << "]";
+        std::cout << "[" << ASTline++ << "]";
         for (int i = 0 ; i < indent ; i++) {
             std::cout << "  ";
         }
@@ -18,10 +18,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Program node
-    llvm::Value *ProgramNode::codegen() {
-        return nullptr;
-    }
-
     void ProgramNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Program:\n";
@@ -32,10 +28,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Class node
-    llvm::Value *ClassNode::codegen() {
-        return nullptr;
-    }
-
     void ClassNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Class: " << name;
@@ -51,10 +43,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Attributr node
-    llvm::Value *AttributeNode::codegen() {
-        return nullptr;
-    }
-
     void AttributeNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Attribute: " << name << " : " << type;
@@ -68,10 +56,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Method node
-    llvm::Value *MethodNode::codegen() {
-        return nullptr;
-    }
-
     void MethodNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Method: " << name << "(";
@@ -94,10 +78,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Identifier node
-    llvm::Value *IdentifierNode::codegen() {
-        return nullptr;
-    }
-
     void IdentifierNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Identifier: " << name << '\n';
@@ -105,10 +85,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Integer node
-    llvm::Value *IntegerNode::codegen() {
-        return nullptr;
-    }
-
     void IntegerNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Integer: " << value << '\n';
@@ -116,10 +92,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // String node
-    llvm::Value *StringNode::codegen() {
-        return nullptr;
-    }
-
     void StringNode::print(int indent) const {
         printIndent(indent);
         std::cout << "String: \"" << value << "\"" << '\n';
@@ -127,10 +99,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Bool node
-    llvm::Value *BoolNode::codegen() {
-        return nullptr;
-    }
-
     void BoolNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Bool: " << (value ? "true" : "false") << '\n';
@@ -138,10 +106,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // New node
-    llvm::Value *NewNode::codegen() {
-        return nullptr;
-    }
-
     void NewNode::print(int indent) const {
         printIndent(indent);
         std::cout << "New: " << type_name << '\n';
@@ -149,9 +113,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // IsVoid node
-    llvm::Value *IsVoidNode::codegen() {
-        return nullptr;
-    }
 
     void IsVoidNode::print(int indent) const {
         printIndent(indent);
@@ -163,9 +124,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Assignment node
-    llvm::Value *AssignmentNode::codegen() {
-        return nullptr;
-    }
 
     void AssignmentNode::print(int indent) const {
         printIndent(indent);
@@ -178,10 +136,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Dispatch node
-    llvm::Value *DispatchNode::codegen() {
-        return nullptr;
-    }
-
     void DispatchNode::print(int indent) const {
         printIndent(indent);
         std::cout << "Dispatch " << method_name << '\n';
@@ -203,10 +157,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // StaticDispatch node
-    llvm::Value *StaticDispatchNode::codegen() {
-        return nullptr;
-    }
-
     void StaticDispatchNode::print(int indent) const {
         printIndent(indent);
         std::cout << "StaticDispatch " << method_name << " @ " << type_name << '\n';
@@ -228,10 +178,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // If node
-    llvm::Value *IfNode::codegen() {
-        return nullptr;
-    }
-
     void IfNode::print(int indent) const {
         printIndent(indent);
         std::cout << "If:\n";
@@ -257,10 +203,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // While node
-    llvm::Value *WhileNode::codegen() {
-        return nullptr;
-    }
-
     void WhileNode::print(int indent) const {
         printIndent(indent);
         std::cout << "While:\n";
@@ -281,9 +223,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Block Node
-    llvm::Value* BlockNode::codegen() {
-        return nullptr;
-    }
 
     void BlockNode::print(int indent) const {
         printIndent(indent);
@@ -295,9 +234,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Let Node
-    llvm::Value* LetNode::codegen() {
-        return nullptr;
-    }
 
     void LetNode::print(int indent) const {
         printIndent(indent);
@@ -324,9 +260,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // CaseBranch Node
-    llvm::Value* CaseBranchNode::codegen() {
-        return nullptr;
-    }
 
     void CaseBranchNode::print(int indent) const {
         printIndent(indent);
@@ -338,9 +271,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // Case Node
-    llvm::Value* CaseNode::codegen() {
-        return nullptr;
-    }
 
     void CaseNode::print(int indent) const {
         printIndent(indent);
@@ -361,9 +291,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // BinaryOp Node
-    llvm::Value* BinaryOpNode::codegen() {
-        return nullptr;
-    }
 
     void BinaryOpNode::print(int indent) const {
         printIndent(indent);
@@ -384,9 +311,6 @@ namespace cool {
 
     //----------------------------------------------------------------------------------------
     // UnaryOp Node
-    llvm::Value* UnaryOpNode::codegen() {
-        return nullptr;
-    }
 
     void UnaryOpNode::print(int indent) const {
         printIndent(indent);

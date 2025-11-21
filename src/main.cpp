@@ -18,7 +18,7 @@ int main(const int argc, char** argv) {
         lex.printTokens();
 
         cool::Parser parser(tokens);
-        auto ast = parser.parse();
+        const auto ast = parser.parse();
 
         std::cout << "\n=== AST ===\n";
         std::cout << "AST pointer: " << ast.get() << '\n';

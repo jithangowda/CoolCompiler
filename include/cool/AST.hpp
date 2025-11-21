@@ -44,7 +44,6 @@ namespace cool {
     class ASTNode {
     public:
         virtual ~ASTNode() = default;
-        virtual llvm::Value *codegen() = 0;
         virtual void print(int indent) const = 0;
     };
 
@@ -54,7 +53,7 @@ namespace cool {
     public:
         std::vector<std::unique_ptr<ClassNode>> classes;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -67,7 +66,7 @@ namespace cool {
         std::string parent;
         std::vector<std::unique_ptr<FeatureNode>> features;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -86,7 +85,7 @@ namespace cool {
         std::string type;
         std::unique_ptr<ExpressionNode> init_expr;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -98,7 +97,7 @@ namespace cool {
         std::vector<std::pair<std::string, std::string>> formals; // (name, type for attributes)
         std::unique_ptr<ExpressionNode> body;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -116,7 +115,6 @@ namespace cool {
 
         explicit IdentifierNode(std::string n) : name(std::move(n)) {}
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -128,7 +126,6 @@ namespace cool {
 
         explicit IntegerNode(int v) : value(v) {}
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -139,7 +136,6 @@ namespace cool {
         std::string value;
         explicit StringNode(std::string v) : value(std::move(v)) {}
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -151,7 +147,6 @@ namespace cool {
 
         explicit BoolNode(bool v) : value(v) {}
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -163,7 +158,6 @@ namespace cool {
 
         explicit NewNode(std::string v) : type_name(std::move(v)) {}
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -173,7 +167,6 @@ namespace cool {
     public:
         std::unique_ptr<ExpressionNode> expr;
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -184,7 +177,7 @@ namespace cool {
         std::string identifier;
         std::unique_ptr<ExpressionNode> expr;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -196,7 +189,7 @@ namespace cool {
         std::unique_ptr<ExpressionNode> object;
         std::vector<std::unique_ptr<ExpressionNode>> arguments;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -209,7 +202,6 @@ namespace cool {
         std::unique_ptr<ExpressionNode> object;
         std::vector<std::unique_ptr<ExpressionNode>> arguments;
 
-        llvm::Value *codegen() override;
         void print(int indent) const override;
     };
 
@@ -221,7 +213,7 @@ namespace cool {
         std::unique_ptr<ExpressionNode> then_branch;
         std::unique_ptr<ExpressionNode> else_branch;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -232,7 +224,7 @@ namespace cool {
         std::unique_ptr<ExpressionNode> condition;
         std::unique_ptr<ExpressionNode> body;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -242,7 +234,7 @@ namespace cool {
     public:
         std::vector<std::unique_ptr<ExpressionNode>> expressions;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -259,7 +251,7 @@ namespace cool {
         std::vector<Binding> bindings;
         std::unique_ptr<ExpressionNode> body;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -271,7 +263,7 @@ namespace cool {
         std::string type_name;
         std::unique_ptr<ExpressionNode> expr;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -283,7 +275,7 @@ namespace cool {
         std::unique_ptr<ExpressionNode> expr;
         std::vector<std::unique_ptr<CaseBranchNode>> branches;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -295,7 +287,7 @@ namespace cool {
         std::unique_ptr<ExpressionNode> left;
         std::unique_ptr<ExpressionNode> right;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 
@@ -306,7 +298,7 @@ namespace cool {
         TokenType op;
         std::unique_ptr<ExpressionNode> expr;
 
-        llvm::Value *codegen() override;
+
         void print(int indent) const override;
     };
 }

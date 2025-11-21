@@ -105,7 +105,7 @@ namespace cool {
         static bool isBinaryOp(TokenType op);
 
         std::vector<Token> &tokens;
-        size_t current_token{0};
+        size_t current_token {0};
         std::unique_ptr<ProgramNode> ast;
     };
 

@@ -1,7 +1,8 @@
-(* hello-world.cl *)
-class Main inherits IO {
-  main() : Object {
-  out_string("Hello, world.\n")
-  } ;
-
-} ;
+class Main {
+    main() : Int {
+        {
+            (new IO).out_string("Hello, Cool World!\n");
+            0;
+        }
+    };
+};

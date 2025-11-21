@@ -26,6 +26,7 @@ add_executable(coolc
         src/Token.cpp
         src/Parser.cpp
         src/AST.cpp
+        src/CodeGenerator.cpp
 
 )
 
