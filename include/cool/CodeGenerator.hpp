@@ -78,8 +78,8 @@ namespace cool {
         // program structure
         void generateProgram(ProgramNode* program);
         void generateClass(ClassNode* classNode);
-        void generateMethod(MethodNode* mehodNode);
-        void generateMainFunttion(); // this will make the execution start from Main.main()
+        void generateMethod(MethodNode* methodNode);
+        void generateMainFunttion(ProgramNode* program); // this will make the execution start from Main.main()
 
         // epresssion code generation
         llvm::Value* generateExpression(ExpressionNode* expr);

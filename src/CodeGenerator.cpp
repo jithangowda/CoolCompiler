@@ -3,7 +3,7 @@
 //
 
 #include "cool/CodeGenerator.hpp"
-
+#include <llvm/IR/Verifier.h>
 
 namespace cool {
 
@@ -128,6 +128,97 @@ namespace cool {
     }
 
     //----------------------------------------------------------------------------------------
+    // IR gen begins
+    void CodeGenerator::generateProgram(ProgramNode* program) {
+        for (auto& cls : program->classes) {
+            generateClass(cls.get());
+        }
+
+        generateMainFunttion(program);
+    }
+
+    //----------------------------------------------------------------------------------------
+    // generates the IR for all class methods
+    void CodeGenerator::generateClass(ClassNode* classNode) {
+        currentClass = classNode->name;
+
+        for (auto& feature : classNode->features) {
+            if (auto method = dynamic_cast<MethodNode*>(feature.get())) {
+                generateMethod(method);
+            }
+        }
+
+        currentClass = "";
+    }
+    //----------------------------------------------------------------------------------------
+    // Method IR for a single func
+    void CodeGenerator::generateMethod(MethodNode* methodNode) {
+        std::vector<llvm::Type*> paramTypes;
+        paramTypes.push_back(llvm::PointerType::getUnqual(classInfo[currentClass].type->getContext()));
+
+        for (auto& formal : methodNode->formals) {
+            paramTypes.push_back(getLLVMType(formal.second));
+        }
+
+        llvm::Type* returnType = getLLVMType(methodNode->return_type);
+        llvm::FunctionType* funcType = llvm::FunctionType::get(returnType, paramTypes, false);
+
+
+        std::string funcName = currentClass + "_" + methodNode->name + "_func";
+        llvm::Function* function = llvm::Function::Create(funcType, llvm::GlobalValue::ExternalLinkage,
+                                                            funcName, module.get());
+
+        llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(*context, "entry", function);
+        builder->SetInsertPoint(entryBlock);
+
+
+        namedValues.clear();
+        auto argIt = function->arg_begin();
+        llvm::Value* selfArg = &*argIt++;
+        namedValues["self"] = selfArg;
+        currentObject = selfArg;
+
+        for (auto& formal : methodNode->formals) {
+            std::string paramName = formal.first;
+            namedValues[paramName] = &*argIt++;
+        }
+
+        if (methodNode->body) {
+            llvm::Value* retVal = generateExpression(methodNode->body.get());
+            builder->CreateRet(retVal);
+        }
+        else {
+            builder->CreateRet(llvm::ConstantInt::get(returnType, 0));
+        }
+
+        llvm::verifyFunction(*function);
+        functions[funcName] = function;
+    }
+
+    //----------------------------------------------------------------------------------------
+    // Ir For main func ( Main.main needs to be there for pgrm execution)
+    void CodeGenerator::generateMainFunttion(ProgramNode* program) {
+        llvm::FunctionType* mainType = llvm::FunctionType::get(intType, false);
+        llvm::Function* mainFunc = llvm::Function::Create(mainType, llvm::Function::ExternalLinkage,
+                                                    "main", module.get());
+
+        llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(*context, "entry", mainFunc);
+        builder->SetInsertPoint(entryBlock);
+
+        bool hasMain = false;
+        for (auto& cls : program->classes) {
+            if (cls->name == "Main") {
+                for (auto& feature : cls->features) {
+                    if (auto method = dynamic_cast<MethodNode*>(feature.get())) {
+                        if (method)
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 
 
