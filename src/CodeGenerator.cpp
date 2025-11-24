@@ -2,6 +2,8 @@
 // Created by jithan on 18/11/25.
 //
 
+/*
+
 #include "cool/CodeGenerator.hpp"
 #include <llvm/IR/Verifier.h>
 
@@ -225,3 +227,4 @@ namespace cool {
 
 
 }
+*/
