@@ -8,7 +8,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "Lexer.hpp"
+#include "cool/Lexer.hpp"
 #include <llvm/IR/Value.h>
 
 

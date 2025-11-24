@@ -17,8 +17,7 @@ llvm_map_components_to_libnames(llvm_libs
         support
 )
 
-# Include headers
-include_directories(include)
+
 
 add_executable(coolc
         src/main.cpp
@@ -27,7 +26,12 @@ add_executable(coolc
         src/Parser.cpp
         src/AST.cpp
         src/CodeGenerator.cpp
+)
 
+# Include headers 
+target_include_directories(coolc PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${LLVM_INCLUDE_DIRS}
 )
 
 target_link_libraries(coolc ${llvm_libs})
