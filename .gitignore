@@ -1,2 +1,5 @@
 build/
 .cache/
+
+IR_*.ll
+program

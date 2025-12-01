@@ -8,7 +8,7 @@ namespace cool {
 
     std::string tokensToString(TokenType type) {
         switch (type) {
-            case TokenType::CLASS: return "CLASS";
+        case TokenType::CLASS: return "CLASS";
         case TokenType::ELSE: return "ELSE";
         case TokenType::FALSE: return "FALSE";
         case TokenType::FI: return "FI";
@@ -43,7 +43,7 @@ namespace cool {
         case TokenType::LESS_EQUAL: return "LESS_EQUAL";
         case TokenType::TILDE: return "TILDE";
         case TokenType::AT: return "AT";
-                case TokenType::DARROW: return "DARROW";
+        case TokenType::DARROW: return "DARROW";
         case TokenType::LPAREN: return "LPAREN";
         case TokenType::RPAREN: return "RPAREN";
         case TokenType::LBRACE: return "LBRACE";
