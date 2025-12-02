@@ -4,284 +4,312 @@
 
 #include "cool/Lexer.hpp"
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <iomanip>
-
 
 namespace cool {
-    cool::Lexer::Lexer(const std::string &filePath) {
-        std::ifstream file(filePath);
+cool::Lexer::Lexer(const std::string &filePath) {
+    std::ifstream file(filePath);
 
-        if (!file) {
-            throw std::runtime_error("Could not open file: " + filePath);
-        }
-
-        std::ostringstream buffer;
-        buffer << file.rdbuf();
-        source = buffer.str();
+    if (!file) {
+        throw std::runtime_error("Could not open file: " + filePath);
     }
 
-    //----------------------------------------------------------------------------------------
-    std::vector<cool::Token> cool::Lexer::tokenize() {
-        tokens.clear();
-        while (pos < source.length()) {
+    std::ostringstream buffer;
+    buffer << file.rdbuf();
+    source = buffer.str();
+}
 
-            skipWhitespace();
+//----------------------------------------------------------------------------------------
+std::vector<cool::Token> cool::Lexer::tokenize() {
+    tokens.clear();
+    while (pos < source.length()) {
 
-            if (pos >= source.length())
-                break;
+        skipWhitespace();
 
-            char current = source[pos];
+        if (pos >= source.length())
+            break;
 
-            if (isdigit(current))
-                tokens.emplace_back(readNumber());
+        char current = source[pos];
 
-            else if (current == '"')
-                tokens.emplace_back(readString());
+        if (isdigit(current))
+            tokens.emplace_back(readNumber());
 
-            else if (isalpha(current) || current == '_')
-                tokens.emplace_back(readIdentifier());
+        else if (current == '"')
+            tokens.emplace_back(readString());
 
-            else if (ispunct(current)) {
-                if (current == '-' && pos+1 < source.length() && peek() == '-' ) {
-                    skipLineComment();
-                    continue;
-                }
+        else if (isalpha(current) || current == '_')
+            tokens.emplace_back(readIdentifier());
 
-                else if (current == '(' && peek() == '*') {
-                    skipBlockComment();
-                    continue;
-                }
-                tokens.emplace_back(readOperator());
+        else if (ispunct(current)) {
+            if (current == '-' && pos + 1 < source.length() && peek() == '-') {
+                skipLineComment();
+                continue;
             }
 
-            else {
-                tokens.emplace_back(TokenType::UNKNOWN, std::string(1, current), line, column);
-                advance();
+            else if (current == '(' && peek() == '*') {
+                skipBlockComment();
+                continue;
             }
+            tokens.emplace_back(readOperator());
         }
 
-        tokens.emplace_back(TokenType::END_OF_FILE, "", line, column);
-        return tokens;
-    }
-
-    //----------------------------------------------------------------------------------------
-    void cool::Lexer::skipWhitespace() {
-        while (pos < source.length() && std::isspace(source[pos]))
+        else {
+            tokens.emplace_back(TokenType::UNKNOWN, std::string(1, current),
+                                line, column);
             advance();
+        }
     }
 
-    //----------------------------------------------------------------------------------------
-    char cool::Lexer::peek() const {
-        if (pos + 1 < source.length())
-            return source[pos + 1];
+    tokens.emplace_back(TokenType::END_OF_FILE, "", line, column);
+    return tokens;
+}
 
+//----------------------------------------------------------------------------------------
+void cool::Lexer::skipWhitespace() {
+    while (pos < source.length() && std::isspace(source[pos]))
+        advance();
+}
+
+//----------------------------------------------------------------------------------------
+char cool::Lexer::peek() const {
+    if (pos + 1 < source.length())
+        return source[pos + 1];
+
+    return '\0';
+}
+
+//----------------------------------------------------------------------------------------
+char cool::Lexer::advance() {
+    if (pos >= source.length())
         return '\0';
+
+    char current = source[pos++];
+
+    if (current == '\n') {
+        line++;
+        column = 1;
+    } else {
+        column++;
     }
 
-    //----------------------------------------------------------------------------------------
-    char cool::Lexer::advance() {
-        if (pos >= source.length())
-            return '\0';
+    return current;
+}
 
-        char current = source[pos++];
+//----------------------------------------------------------------------------------------
+// anything between '--' and \n are skipped (page 15 cool-manual)
+void cool::Lexer::skipLineComment() {
+    while (pos < source.length() && source[pos] != '\n')
+        advance();
+}
 
-        if (current == '\n') {
-            line++;
-            column = 1;
-        } else {
-            column++;
-        }
+//----------------------------------------------------------------------------------------
+// anything inside  (∗ . . . ∗) are skipped (page 15 cool-manual)
+// it does nested comments .. I dont know why but ok ;(
+/*
+(*
+This is a comment
+(* This is a nested comment *)
+Back in the outer comment
+*)
+*/
+void cool::Lexer::skipBlockComment() {
+    advance(); // consuem (
+    advance(); // consume *
 
-        return current;
-    }
+    int depth{1};
+    while (pos < source.length() && depth > 0) {
 
-    //----------------------------------------------------------------------------------------
-    // anything between '--' and \n are skipped (page 15 cool-manual)
-    void cool::Lexer::skipLineComment() {
-        while (pos < source.length() && source[pos] != '\n')
+        if (source[pos] == '(' && peek() == '*') {
+            depth++;
             advance();
+            advance();
+        } else if (source[pos] == '*' && peek() == ')') {
+            depth--;
+            advance(); // consume *
+            advance(); // consmue )
+        } else {
+            advance();
+        }
     }
 
-    //----------------------------------------------------------------------------------------
-    // anything inside  (∗ . . . ∗) are skipped (page 15 cool-manual)
-    // it does nested comments .. I dont know why but ok ;(
-    /*
-    (*
-    This is a comment
-    (* This is a nested comment *)
-    Back in the outer comment
-    *)
-    */
-    void cool::Lexer::skipBlockComment() {
-        advance(); // consuem (
-        advance(); // consume *
+    if (depth > 0)
+        throw std::runtime_error("Unterminated Block comment");
+}
 
-        int depth {1};
-        while (pos < source.length() && depth > 0) {
+//----------------------------------------------------------------------------------------
+// eg - 68
+cool::Token cool::Lexer::readNumber() {
+    int startLine{line};
+    int startCol{column};
+    std::string number;
 
-            if (source[pos] == '(' && peek() == '*') {
-                depth++;
-                advance();
-                advance();
-            }
-            else if (source[pos] == '*' && peek() == ')') {
-                depth--;
-                advance(); // consume *
-                advance(); // consmue )
-            }
-            else {
-                advance();
-            }
-        }
-
-        if (depth > 0)
-            throw std::runtime_error("Unterminated Block comment");
+    while (pos < source.length() && std::isdigit(source[pos])) {
+        number += advance();
     }
 
-    //----------------------------------------------------------------------------------------
-    // eg - 68
-    cool::Token cool::Lexer::readNumber() {
-        int startLine {line};
-        int startCol {column};
-        std::string number;
+    return cool::Token{TokenType::INTEGER, number, startLine, startCol};
+}
 
-        while (pos < source.length() && std::isdigit(source[pos])) {
-            number += advance();
-        }
+//----------------------------------------------------------------------------------------
+// eg - "HelloWorld"
+cool::Token cool::Lexer::readString() {
+    int startLine{line};
+    int startCol{column};
+    std::string str;
 
-        return cool::Token{TokenType::INTEGER, number, startLine, startCol};
-    }
+    advance(); // to skip first "
 
-    //----------------------------------------------------------------------------------------
-    // eg - "HelloWorld"
-    cool::Token cool::Lexer::readString() {
-        int startLine {line};
-        int startCol {column};
-        std::string str;
+    while (pos < source.length() && source[pos] != '"') {
+        if (source[pos] == '\\') { // '\\' meas backslash
+            advance();
 
-        advance(); // to skip first "
-
-        while (pos < source.length() && source[pos] != '"') {
-            if (source[pos] == '\\') { // '\\' meas backslash
-                advance();
-
-                switch (source[pos]) {
-                    case 'b': str += '\b'; break;
-                    case 't': str += '\t'; break;
-                    case 'n': str += '\n'; break;
-                    case 'f': str += '\f'; break; // formfeed
-                    case '\\': str += '\\'; break;
-                    case '"': str += '"'; break; // incase " comes inside again
-                    default: str += source[pos]; break;
-
-                }
-                advance();
+            switch (source[pos]) {
+            case 'b':
+                str += '\b';
+                break;
+            case 't':
+                str += '\t';
+                break;
+            case 'n':
+                str += '\n';
+                break;
+            case 'f':
+                str += '\f';
+                break; // formfeed
+            case '\\':
+                str += '\\';
+                break;
+            case '"':
+                str += '"';
+                break; // incase " comes inside again
+            default:
+                str += source[pos];
+                break;
             }
-
-            else if (source[pos] == '\n')
-                throw std::runtime_error("Unterminated String");
-
-            else
-                str += advance();
-
-            // Max string len i want is 1024
-            if (str.length() > 1024)
-                throw std::runtime_error("String too long: Max 1024 char");
+            advance();
         }
 
-        if (pos >= source.length())
+        else if (source[pos] == '\n')
             throw std::runtime_error("Unterminated String");
 
-        advance(); //consume "
+        else
+            str += advance();
 
-        return cool::Token{TokenType::STRING, str, startLine, startCol};
-
+        // Max string len i want is 1024
+        if (str.length() > 1024)
+            throw std::runtime_error("String too long: Max 1024 char");
     }
 
-    //----------------------------------------------------------------------------------------
-    cool::Token cool::Lexer::readIdentifier() {
-        int startLine {line};
-        int startCol {column};
-        std::string identifier;
+    if (pos >= source.length())
+        throw std::runtime_error("Unterminated String");
 
+    advance(); // consume "
+
+    return cool::Token{TokenType::STRING, str, startLine, startCol};
+}
+
+//----------------------------------------------------------------------------------------
+cool::Token cool::Lexer::readIdentifier() {
+    int startLine{line};
+    int startCol{column};
+    std::string identifier;
+
+    identifier += advance();
+
+    while (pos < source.length() &&
+           (isalnum(source[pos]) || source[pos] == '_')) {
         identifier += advance();
-
-        while (pos < source.length() && (isalnum(source[pos]) || source[pos] == '_')) {
-            identifier += advance();
-        }
-
-        auto k_it = KEYWORDS.find(identifier);
-        if (k_it != KEYWORDS.end())
-            return Token{k_it->second, identifier, startLine, startCol};
-
-        auto s_it = SPECIAL_IDS.find(identifier);
-        if (s_it != SPECIAL_IDS.end())
-            return Token{s_it->second, identifier, startLine, startCol};
-
-        TokenType type = isupper(identifier[0]) ? TokenType::TYPE_ID : TokenType::OBJECT_ID;
-        return Token{type, identifier, startLine, startCol};
-
     }
 
-    //----------------------------------------------------------------------------------------
-    cool::Token cool::Lexer::readOperator() {
-        int startLine {line};
-        int startCol {column};
-        char first_operator = advance();
+    auto k_it = KEYWORDS.find(identifier);
+    if (k_it != KEYWORDS.end())
+        return Token{k_it->second, identifier, startLine, startCol};
 
-        std::string op(1, first_operator);
+    auto s_it = SPECIAL_IDS.find(identifier);
+    if (s_it != SPECIAL_IDS.end())
+        return Token{s_it->second, identifier, startLine, startCol};
 
-        if (pos < source.length()) {
-            char second_operator = source[pos];
+    TokenType type =
+        isupper(identifier[0]) ? TokenType::TYPE_ID : TokenType::OBJECT_ID;
+    return Token{type, identifier, startLine, startCol};
+}
 
-            std::string twoCharOp = op + std::string(1, second_operator);
+//----------------------------------------------------------------------------------------
+cool::Token cool::Lexer::readOperator() {
+    int startLine{line};
+    int startCol{column};
+    char first_operator = advance();
 
-            if (twoCharOp == "<-") {
-                advance();
-                return Token{TokenType::ASSIGN, twoCharOp, startLine, startCol};
-            }
+    std::string op(1, first_operator);
 
-            else if (twoCharOp == "<=") {
-                advance();
-                return Token{TokenType::LESS_EQUAL, twoCharOp, startLine, startCol};
-            }
-            else if (twoCharOp == "=>") {
-                advance();
-                return Token{TokenType::DARROW, twoCharOp, startLine, startCol};
-            }
+    if (pos < source.length()) {
+        char second_operator = source[pos];
+
+        std::string twoCharOp = op + std::string(1, second_operator);
+
+        if (twoCharOp == "<-") {
+            advance();
+            return Token{TokenType::ASSIGN, twoCharOp, startLine, startCol};
         }
 
-        switch (first_operator) {
-            case '+': return Token{TokenType::PLUS, op, startLine, startCol};
-            case '-': return Token{TokenType::MINUS, op, startLine, startCol};
-            case '*': return Token{TokenType::STAR, op, startLine, startCol};
-            case '/': return Token{TokenType::SLASH, op, startLine, startCol};
-            case '=': return Token{TokenType::EQUAL, op, startLine, startCol};
-            case '<': return Token{TokenType::LESS_THAN, op, startLine, startCol};
-            case '~': return Token{TokenType::TILDE, op, startLine, startCol};
-            case '@': return Token{TokenType::AT, op, startLine, startCol};
-            case '(': return Token{TokenType::LPAREN, op, startLine, startCol};
-            case ')': return Token{TokenType::RPAREN, op, startLine, startCol};
-            case '{': return Token{TokenType::LBRACE, op, startLine, startCol};
-            case '}': return Token{TokenType::RBRACE, op, startLine, startCol};
-            case ';': return Token{TokenType::SEMICOLON, op, startLine, startCol};
-            case ':': return Token{TokenType::COLON, op, startLine, startCol};
-            case ',': return Token{TokenType::COMMA, op, startLine, startCol};
-            case '.': return Token{TokenType::DOT, op, startLine, startCol};
-            default: return Token{TokenType::UNKNOWN, op, startLine, startCol};
+        else if (twoCharOp == "<=") {
+            advance();
+            return Token{TokenType::LESS_EQUAL, twoCharOp, startLine, startCol};
+        } else if (twoCharOp == "=>") {
+            advance();
+            return Token{TokenType::DARROW, twoCharOp, startLine, startCol};
         }
     }
 
-    //----------------------------------------------------------------------------------------
-    void cool::Lexer::printTokens() const {
-        for (auto & token : tokens) {
-            TokenType t = token.type;
-            std::string s = token.value;
-
-            std::cerr << std::left << std::setw(15) << cool::tokensToString(t) << s << '\n';
-        }
+    switch (first_operator) {
+    case '+':
+        return Token{TokenType::PLUS, op, startLine, startCol};
+    case '-':
+        return Token{TokenType::MINUS, op, startLine, startCol};
+    case '*':
+        return Token{TokenType::STAR, op, startLine, startCol};
+    case '/':
+        return Token{TokenType::SLASH, op, startLine, startCol};
+    case '=':
+        return Token{TokenType::EQUAL, op, startLine, startCol};
+    case '<':
+        return Token{TokenType::LESS_THAN, op, startLine, startCol};
+    case '~':
+        return Token{TokenType::TILDE, op, startLine, startCol};
+    case '@':
+        return Token{TokenType::AT, op, startLine, startCol};
+    case '(':
+        return Token{TokenType::LPAREN, op, startLine, startCol};
+    case ')':
+        return Token{TokenType::RPAREN, op, startLine, startCol};
+    case '{':
+        return Token{TokenType::LBRACE, op, startLine, startCol};
+    case '}':
+        return Token{TokenType::RBRACE, op, startLine, startCol};
+    case ';':
+        return Token{TokenType::SEMICOLON, op, startLine, startCol};
+    case ':':
+        return Token{TokenType::COLON, op, startLine, startCol};
+    case ',':
+        return Token{TokenType::COMMA, op, startLine, startCol};
+    case '.':
+        return Token{TokenType::DOT, op, startLine, startCol};
+    default:
+        return Token{TokenType::UNKNOWN, op, startLine, startCol};
     }
-};
+}
+
+//----------------------------------------------------------------------------------------
+void cool::Lexer::printTokens() const {
+    for (auto &token : tokens) {
+        TokenType t = token.type;
+        std::string s = token.value;
+
+        std::cerr << std::left << std::setw(15) << cool::tokensToString(t) << s
+                  << '\n';
+    }
+}
+}; // namespace cool
