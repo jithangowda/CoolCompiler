@@ -24,7 +24,7 @@ void CodeGenerator::declareRuntimeFunctions() {
   printfFunc = llvm::Function::Create(
       printfType, llvm::Function::ExternalLinkage, "printf", module.get());
 
-  llvm::FunctionType *mallocType = llvm::FunctionType::get(
+ llvm::FunctionType *mallocType = llvm::FunctionType::get(
       int8PtrType, {llvm::Type::getInt64Ty(*context)}, false);
   mallocFunc = llvm::Function::Create(
       mallocType, llvm::Function::ExternalLinkage, "malloc", module.get());
