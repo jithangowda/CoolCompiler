@@ -2,8 +2,7 @@
 
 A compiler for the COOL language (Stanford spec) generating LLVM IR. Built with C++17, LLVM, and CMake.
 
-Compilation Pipeline
-COOL Source → Lexer → Parser → AST → CodeGen → LLVM IR → Executable
+Compilation Pipeline: COOL Source → Lexer → Parser → AST → CodeGen → LLVM IR → Executable
 
 ## Build
 
