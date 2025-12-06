@@ -2,6 +2,9 @@
 
 A compiler for the COOL language (Stanford spec) generating LLVM IR. Built with C++17, LLVM, and CMake.
 
+Compilation Pipeline
+COOL Source → Lexer → Parser → AST → CodeGen → LLVM IR → Executable
+
 ## Build
 
 ```bash
@@ -19,7 +22,7 @@ clang IR_maths.ll -o program         # Creates executable
 ./program                            # Runs the program
 
 ```
-### Example COOL COde
+### Example COOL Code
 
 ```coolc
 class Main {
@@ -50,4 +53,15 @@ class Main {
     }
   };
 };
+```
+
+### Usage
+
+```bash
+./build/coolc <input.cl> [output_dir]
+
+Examples:
+
+./build/coolc program.cl             # Creates IR_program.ll
+./build/coolc program.cl ./output    # Creates output/IR_program.ll
 ```
