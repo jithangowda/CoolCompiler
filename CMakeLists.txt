@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find LLVM
-set(LLVM_DIR "/usr/lib/cmake/llvm18" )
 find_package(LLVM REQUIRED CONFIG)
 
 # Add LLVM
